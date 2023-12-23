@@ -28,7 +28,7 @@ public:
 private:
   JobStatus() = default;
 
-  void setFlag() { mPromise.set_value(true); }
+  void setFlag() { this->mPromise.set_value(true); }
 
 private:
   bool mShouldStopped = false;
@@ -42,7 +42,7 @@ class JobContract;
 
 typedef std::function<void(JobStatus &)> JobType;
 
-class JobContract final {
+class JobContract {
   friend class ContractManager;
 
 public:
@@ -53,6 +53,9 @@ public:
   JobContract &operator=(JobContract &&) = default;
   JobContract &operator=(const JobContract &) = delete;
 
+  JobContract(JobType job, JobStatus jobStatus)
+      : mJob{std::move(job)}, mJobStatus{std::move(jobStatus)} {}
+
   void start() { this->mJob(this->mJobStatus); }
 
   //     bool wait() {
@@ -61,10 +64,6 @@ public:
   //     }
   //     return mFinished;
   //   }
-
-private:
-  JobContract(JobType job, JobStatus jobStatus)
-      : mJob{std::move(job)}, mJobStatus{std::move(jobStatus)} {}
 
 private:
   JobType mJob;

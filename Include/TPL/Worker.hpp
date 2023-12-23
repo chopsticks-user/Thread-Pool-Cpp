@@ -14,49 +14,45 @@ namespace tpl {
 
 class WorkerManager;
 
+typedef std::unique_lock<std::mutex> LockType;
+
 #if __cplusplus >= 201402L && __cplusplus < 202002L
 
 class Worker {
-  friend class WorkerManager;
-
-  typedef std::unique_lock<std::mutex> LockType;
+  //   friend class WorkerManager;
 
 public:
-  //   std::unique_ptr<JobType> getJob() { return nullptr; }
+  Worker() = delete;
+  Worker(const Worker &) = delete;
+  Worker(Worker &&) noexcept = default;
+  Worker &operator=(Worker &&) = default;
+  Worker &operator=(const Worker &) noexcept = delete;
 
-private:
-  Worker(const std::mutex &sharedMutex,
-         const std::condition_variable &sharedCondition)
-      : mSharedMutex{sharedMutex}, mSharedCondition{sharedCondition} {}
+  //   explicit Worker(const std::mutex &sharedMutex,
+  //                   const std::condition_variable &sharedCondition)
+  //       : mSharedMutex{sharedMutex}, mSharedCondition{sharedCondition} {}
 
-  LockType createLock() {
-    return LockType{const_cast<std::mutex &>(this->mSharedMutex)};
-  }
+  explicit Worker(std::function<void(Worker &)> workerLoop)
+      : mThread{workerLoop, std::ref(*this)} {}
 
-  static void threadLoop(Worker &worker) {
-    while (true) {
-      std::unique_ptr<JobContract> contract = nullptr;
-      {
-        auto lock = worker.createLock();
-        if (worker.mShouldTerminate) {
-          worker.mThread.join();
-        }
-        if (worker.mpCurrentContract == nullptr) {
-          continue;
-        }
-        contract = std::move(worker.mpCurrentContract);
-        worker.mpCurrentContract = nullptr;
-      }
-      contract->start();
+  ~Worker() noexcept { this->terminate(); }
+
+  //   bool retired() const noexcept { return this->mShouldTerminate; }
+
+  //   void resign() noexcept { this->mShouldTerminate = true; }
+
+  void terminate() noexcept {
+    this->shouldTerminate = true;
+    if (this->mThread.joinable()) {
+      this->mThread.join();
     }
   }
 
+public:
+  bool shouldTerminate = false;
+
 private:
-  const std::mutex &mSharedMutex;
-  const std::condition_variable &mSharedCondition;
-  std::unique_ptr<JobContract> mpCurrentContract = nullptr;
-  std::thread mThread = std::thread{Worker::threadLoop, std::ref(*this)};
-  bool mShouldTerminate = false;
+  std::thread mThread;
 };
 
 #else // C++20 or later
