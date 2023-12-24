@@ -6,10 +6,6 @@
 
 namespace tpl {
 
-class WorkerManager;
-
-#if __cplusplus >= 201402L && __cplusplus < 202002L
-
 class Worker {
   friend class WorkerManager;
 
@@ -34,12 +30,6 @@ private:
 private:
   std::thread mThread;
 };
-
-#else // C++20 or later
-
-class Worker {};
-
-#endif // C++14 or C++17
 
 } // namespace tpl
 

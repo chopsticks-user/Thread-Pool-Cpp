@@ -9,8 +9,6 @@
 
 namespace tpl {
 
-#if __cplusplus >= 201402L && __cplusplus < 202002L
-
 class ThreadPool {
 public:
   static u32 nConcurrentThreads() noexcept {
@@ -58,10 +56,6 @@ private:
   std::unique_ptr<WorkerManager> mWorkerManager;
   std::mutex mMutex;
 };
-
-#else // C++20 or later
-
-#endif // C++14 or later
 
 } // namespace tpl
 

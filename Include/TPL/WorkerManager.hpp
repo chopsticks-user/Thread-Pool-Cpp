@@ -1,5 +1,5 @@
-#ifndef TPL_SOURCE_WORKER_MANAGER_HPP
-#define TPL_SOURCE_WORKER_MANAGER_HPP
+#ifndef TPL_INCLUDE_TPL_WORKER_MANAGER_HPP
+#define TPL_INCLUDE_TPL_WORKER_MANAGER_HPP
 
 #include "Base.hpp"
 #include "JobContract.hpp"
@@ -105,4 +105,4 @@ private:
 
 } // namespace tpl
 
-#endif // TPL_SOURCE_WORKER_MANAGER_HPP
+#endif // TPL_INCLUDE_TPL_WORKER_MANAGER_HPP

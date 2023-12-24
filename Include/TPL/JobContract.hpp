@@ -5,18 +5,15 @@
 
 namespace tpl {
 
-class ContractManager;
-class JobContract;
-
 class ContractStatus {
   friend class JobContract;
 
 public:
   ContractStatus() = default;
   ~ContractStatus() = default;
-  ContractStatus(const ContractStatus &) = default;
+  ContractStatus(const ContractStatus &) = delete;
   ContractStatus(ContractStatus &&) = default;
-  ContractStatus &operator=(ContractStatus &&) = default;
+  ContractStatus &operator=(ContractStatus &&) = delete;
   ContractStatus &operator=(const ContractStatus &) = default;
 
   void requestStop() noexcept { this->mShouldBeStopped = true; }

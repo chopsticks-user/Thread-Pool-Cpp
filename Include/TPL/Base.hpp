@@ -1,17 +1,32 @@
 #ifndef TPL_INCLUDE_TPL_BASE_HPP
 #define TPL_INCLUDE_TPL_BASE_HPP
 
+#if __cplusplus >= 201402L
 #include <condition_variable>
 #include <functional>
 #include <future>
 #include <mutex>
-#include <optional>
 #include <stdexcept>
 #include <thread>
+#endif // C++14
+
+#if __cplusplus >= 201703L
+#include <any>
+#include <optional>
+#endif // C++17
+
+#if __cplusplus >= 202002L
+#include <barrier>
+#include <latch>
+#include <stop_token>
+#endif // C++20
 
 namespace tpl {
 
 static_assert(__cplusplus >= 201402L, "TPL requires C++14 or later");
+constexpr bool cpp14 = __cplusplus < 201703L && __cplusplus >= 201402L;
+constexpr bool cpp17 = __cplusplus < 202002L && __cplusplus >= 201703L;
+constexpr bool cpp20 = !cpp14 && !cpp17;
 constexpr bool cppAtLeast14 = __cplusplus >= 201402L;
 constexpr bool cppAtLeast17 = __cplusplus >= 201703L;
 constexpr bool cppAtLeast20 = __cplusplus >= 202002L;
