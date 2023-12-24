@@ -9,8 +9,6 @@
 
 namespace tpl {
 
-typedef std::unique_lock<std::mutex> UniqueLockType;
-
 class ContractManager {
 public:
   ContractManager() = default;
@@ -28,7 +26,7 @@ public:
         JobContract{std::move(job), std::make_shared<ContractStatus>()});
   }
 
-  std::shared_ptr<JobContract> getContract() noexcept {
+  JobContractPtr getContract() noexcept {
     UniqueLockType lock{this->mMutex};
 
     if (this->mContractQueue.empty()) {

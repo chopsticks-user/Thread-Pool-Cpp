@@ -3,8 +3,6 @@
 
 #include "Base.hpp"
 
-#include <future>
-
 namespace tpl {
 
 class ContractManager;
@@ -46,10 +44,6 @@ private:
   std::promise<bool> mPromise;
   std::future<bool> mFuture = mPromise.get_future();
 };
-
-typedef std::shared_ptr<ContractStatus> ContractStatusPtr;
-typedef std::function<void(ContractStatus &)> JobType;
-typedef std::weak_ptr<ContractStatus> StatusObserverPtr;
 
 class JobContract {
   friend class ContractManager;

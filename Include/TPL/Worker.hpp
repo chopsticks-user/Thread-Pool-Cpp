@@ -4,13 +4,6 @@
 #include "Base.hpp"
 #include "JobContract.hpp"
 
-#include <condition_variable>
-#include <functional>
-#include <iostream>
-#include <mutex>
-#include <optional>
-#include <thread>
-
 namespace tpl {
 
 class WorkerManager;
@@ -30,12 +23,9 @@ public:
   ~Worker() noexcept { this->terminate(); }
 
 private:
-  explicit Worker(std::function<void()> workerLoop) : mThread{workerLoop} {}
+  explicit Worker(WorkerFuncType workerLoop) : mThread{workerLoop} {}
 
   void terminate() noexcept {
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lock{mtx};
-
     if (this->mThread.joinable()) {
       this->mThread.join();
     }

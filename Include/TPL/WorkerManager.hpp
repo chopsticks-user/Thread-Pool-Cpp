@@ -10,9 +10,6 @@
 
 namespace tpl {
 
-typedef std::unique_lock<std::mutex> UniqueLockType;
-typedef std::lock_guard<std::mutex> ScopedLockType;
-
 class WorkerManager {
 public:
   WorkerManager() = delete;
@@ -39,7 +36,7 @@ public:
 
   u64 nAvailableWorkers() const noexcept { return this->mNAvailableWorkers; }
 
-  ContractStatusPtr assignJob(std::shared_ptr<JobContract> pContract) noexcept {
+  ContractStatusPtr assignJob(JobContractPtr pContract) noexcept {
     ScopedLockType lock{this->mMutex};
 
     if (pContract == nullptr) {
@@ -65,7 +62,7 @@ public:
 private:
   void workerLoop() {
     while (true) {
-      std::shared_ptr<JobContract> contract;
+      JobContractPtr contract;
       {
         UniqueLockType lock{this->mMutex};
 
@@ -99,8 +96,8 @@ private:
 private:
   std::mutex mMutex = {};
   std::condition_variable mCondition = {};
-  std::queue<std::shared_ptr<JobContract>> mContractQueue = {};
-  std::queue<std::shared_ptr<JobContract>> mPendingContractQueue = {};
+  std::queue<JobContractPtr> mContractQueue = {};
+  std::queue<JobContractPtr> mPendingContractQueue = {};
   std::vector<Worker> mWorkers = {};
   std::atomic<u64> mNAvailableWorkers{0};
   std::atomic<bool> mShouldTerminate{false};

@@ -1,52 +1,48 @@
 #ifndef TPL_INCLUDE_TPL_BASE_HPP
 #define TPL_INCLUDE_TPL_BASE_HPP
 
+#include <condition_variable>
+#include <functional>
+#include <future>
+#include <mutex>
+#include <optional>
 #include <stdexcept>
-#include <tuple>
-#include <typeinfo>
+#include <thread>
 
 namespace tpl {
+
+static_assert(__cplusplus >= 201402L, "TPL requires C++14 or later");
+constexpr bool cppAtLeast14 = __cplusplus >= 201402L;
+constexpr bool cppAtLeast17 = __cplusplus >= 201703L;
+constexpr bool cppAtLeast20 = __cplusplus >= 202002L;
 
 typedef int8_t i8;
 typedef int16_t i16;
 typedef int32_t i32;
 typedef int64_t i64;
-
 typedef uint8_t u8;
 typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
-
 typedef float f32;
 typedef double f64;
-
 typedef bool b8;
 typedef uint32_t b32;
-
 typedef const char *cString;
 
-// template <typename Type> //
-// cString typenameStr() noexcept {
-//   return typeid(Type).name();
-// }
+class Worker;
+class WorkerManager;
+class ContractStatus;
+class JobContract;
+class ContractManager;
 
-// template <u64 Index, typename... Args> //
-// void iterateTuple(std::tuple<Args...> &tp, auto func) {
-//   func(std::get<Index>(tp));
-//   if constexpr (Index + 1 != sizeof...(Args)) {
-//     iterateTuple<Index + 1>(tp, func);
-//   }
-// }
-
-// template <typename> //
-// struct First2ArgTypes;
-
-// template <typename FuncType, typename Arg1Type, typename Arg2Type,
-//           typename... Args> //
-// struct First2ArgTypes<FuncType(Arg1Type, Arg2Type, Args...)> {
-//   using type1 = Arg1Type;
-//   using type2 = Arg2Type;
-// };
+typedef std::unique_lock<std::mutex> UniqueLockType;
+typedef std::lock_guard<std::mutex> ScopedLockType;
+typedef std::function<void()> WorkerFuncType;
+typedef std::function<void(ContractStatus &)> JobType;
+typedef std::shared_ptr<ContractStatus> ContractStatusPtr;
+typedef std::weak_ptr<ContractStatus> StatusObserverPtr;
+typedef std::shared_ptr<JobContract> JobContractPtr;
 
 } // namespace tpl
 
