@@ -6,6 +6,7 @@
 
 #include <condition_variable>
 #include <functional>
+#include <iostream>
 #include <mutex>
 #include <optional>
 #include <thread>
@@ -14,12 +15,10 @@ namespace tpl {
 
 class WorkerManager;
 
-typedef std::unique_lock<std::mutex> LockType;
-
 #if __cplusplus >= 201402L && __cplusplus < 202002L
 
 class Worker {
-  //   friend class WorkerManager;
+  friend class WorkerManager;
 
 public:
   Worker() = delete;
@@ -28,30 +27,29 @@ public:
   Worker &operator=(Worker &&) = default;
   Worker &operator=(const Worker &) noexcept = delete;
 
-  //   explicit Worker(const std::mutex &sharedMutex,
-  //                   const std::condition_variable &sharedCondition)
-  //       : mSharedMutex{sharedMutex}, mSharedCondition{sharedCondition} {}
+  ~Worker() noexcept { this->terminate(); }
 
+private:
   explicit Worker(std::function<void(Worker &)> workerLoop)
       : mThread{workerLoop, std::ref(*this)} {}
 
-  ~Worker() noexcept { this->terminate(); }
-
-  //   bool retired() const noexcept { return this->mShouldTerminate; }
-
-  //   void resign() noexcept { this->mShouldTerminate = true; }
-
   void terminate() noexcept {
-    this->shouldTerminate = true;
+    // std::mutex mtx;
+    // std::unique_lock<std::mutex> lock{mtx};
+
+    // if (!this->mShouldTerminate) {
+    //   return;
+    // }
+
+    // std::cout << std::boolalpha << this->mShouldTerminate << std::endl;
+
     if (this->mThread.joinable()) {
       this->mThread.join();
     }
   }
 
-public:
-  bool shouldTerminate = false;
-
 private:
+  bool mShouldTerminate = false;
   std::thread mThread;
 };
 

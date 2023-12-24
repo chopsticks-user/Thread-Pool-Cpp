@@ -8,39 +8,48 @@
 namespace tpl {
 
 class ContractManager;
-
-class JobStatus {
-  friend class ContractManager;
-
-public:
-  ~JobStatus() = default;
-  JobStatus(const JobStatus &) = delete;
-  JobStatus(JobStatus &&) = default;
-  JobStatus &operator=(JobStatus &&) = default;
-  JobStatus &operator=(const JobStatus &) = delete;
-
-  bool shouldStopped() const noexcept { return this->mShouldStopped; }
-
-  bool shouldTransferred() const noexcept { return this->mShouldTransferred; }
-
-  bool isFinished() { return this->mFuture.get(); }
-
-private:
-  JobStatus() = default;
-
-  void setFlag() { this->mPromise.set_value(true); }
-
-private:
-  bool mShouldStopped = false;
-  bool mShouldTransferred = false;
-  std::promise<bool> mPromise;
-  std::future<bool> mFuture = mPromise.get_future();
-  //   bool mFinished = false;
-};
-
 class JobContract;
 
-typedef std::function<void(JobStatus &)> JobType;
+class ContractStatus {
+  friend class JobContract;
+
+public:
+  ContractStatus() = default;
+  ~ContractStatus() = default;
+  ContractStatus(const ContractStatus &) = default;
+  ContractStatus(ContractStatus &&) = default;
+  ContractStatus &operator=(ContractStatus &&) = default;
+  ContractStatus &operator=(const ContractStatus &) = default;
+
+  void requestStop() noexcept { this->mShouldBeStopped = true; }
+
+  bool stopRequested() const noexcept { return this->mShouldBeStopped; }
+
+  // https://stackoverflow.com/questions/10890242/get-the-status-of-a-stdfuture
+  bool finished() const noexcept {
+    return this->mFuture.wait_for(std::chrono::microseconds(0)) ==
+           std::future_status::ready;
+  }
+
+  bool wait() {
+    if (this->finished()) {
+      return true;
+    }
+    return mFuture.get();
+  }
+
+private:
+  void signalFinished() { this->mPromise.set_value(true); }
+
+private:
+  bool mShouldBeStopped = false;
+  std::promise<bool> mPromise;
+  std::future<bool> mFuture = mPromise.get_future();
+};
+
+typedef std::shared_ptr<ContractStatus> ContractStatusPtr;
+typedef std::function<void(ContractStatus &)> JobType;
+typedef std::weak_ptr<ContractStatus> StatusObserverPtr;
 
 class JobContract {
   friend class ContractManager;
@@ -53,21 +62,19 @@ public:
   JobContract &operator=(JobContract &&) = default;
   JobContract &operator=(const JobContract &) = delete;
 
-  JobContract(JobType job, JobStatus jobStatus)
-      : mJob{std::move(job)}, mJobStatus{std::move(jobStatus)} {}
+  void start() noexcept { this->mJob(*this->mpJobStatus); }
 
-  void start() { this->mJob(this->mJobStatus); }
+  void signalFinished() noexcept { this->mpJobStatus->signalFinished(); }
 
-  //     bool wait() {
-  //     if (!mFinished) {
-  //       mFinished = mFuture.get();
-  //     }
-  //     return mFinished;
-  //   }
+  ContractStatusPtr getStatusObserver() noexcept { return this->mpJobStatus; }
+
+private:
+  JobContract(JobType job, ContractStatusPtr jobStatus)
+      : mJob{std::move(job)}, mpJobStatus{jobStatus} {}
 
 private:
   JobType mJob;
-  JobStatus mJobStatus;
+  ContractStatusPtr mpJobStatus;
 };
 
 } // namespace tpl
