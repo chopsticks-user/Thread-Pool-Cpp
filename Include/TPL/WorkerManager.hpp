@@ -27,15 +27,13 @@ public:
 
     mWorkers.reserve(nWorkers);
     while (nWorkers > 0) {
-      mWorkers.emplace_back(
-          Worker{[&](Worker &worker) { this->workerLoop(worker); }});
+      mWorkers.emplace_back(Worker{[&]() { this->workerLoop(); }});
       nWorkers--;
     }
-    this->mNActiveWorkers = this->mWorkers.size();
-    this->mNAvailableWorkers.store(this->mNActiveWorkers);
+    this->mNAvailableWorkers.store(this->mWorkers.size());
   }
 
-  u64 nActiveWorkers() const { return this->mNActiveWorkers; }
+  u64 nWorkers() const { return this->mWorkers.size(); }
 
   u64 nAvailableWorkers() const { return this->mNAvailableWorkers; }
 
@@ -52,45 +50,34 @@ public:
   }
 
   void clear() noexcept {
-    { auto lock = LockType{this->mMutex}; }
+    {
+      auto lock = LockType{this->mMutex};
+      this->mShouldTerminate.store(true);
+    }
 
     // for (auto &worker : this->mWorkers) {
     //   worker.mShouldTerminate = true;
     // }
 
-    this->mShouldTerminate.store(true);
     this->mCondition.notify_all();
     this->mWorkers.clear();
-    this->mNActiveWorkers.store(0);
     this->mNAvailableWorkers.store(0);
   }
 
 private:
-  void workerLoop(Worker &worker) {
+  void workerLoop() {
     while (true) {
       std::shared_ptr<JobContract> contract;
       {
         auto lock = LockType{this->mMutex};
 
-        this->mCondition.wait(lock, [&] {
+        this->mCondition.wait(lock, [this] {
           return !this->mContractQueue.empty() || this->mShouldTerminate.load();
         });
 
-        // if (!this->mContractQueue.empty()) {
-        //   contract = this->mContractQueue.front();
-        //   this->mContractQueue.pop();
-        //   --this->mNAvailableWorkers;
-        // } else if (worker.mShouldTerminate) {
-        //   --this->mNActiveWorkers;
-        //   --this->mNAvailableWorkers;
-        //   std::cout << "terminating" << std::endl;
-        //   return;
-        // }
-
-        if (this->mShouldTerminate.load()) {
-          --this->mNActiveWorkers;
+        // https://codereview.stackexchange.com/questions/275834/tiny-thread-pool-implementation
+        if (this->mShouldTerminate.load() && this->mContractQueue.empty()) {
           --this->mNAvailableWorkers;
-          std::cout << "terminating" << std::endl;
           return;
         }
 
@@ -98,7 +85,6 @@ private:
         this->mContractQueue.pop();
         this->mPendingContractQueue.push(contract);
         --this->mNAvailableWorkers;
-        std::cout << "received" << std::endl;
       }
 
       contract->start();
@@ -118,7 +104,6 @@ private:
   std::queue<std::shared_ptr<JobContract>> mContractQueue = {};
   std::queue<std::shared_ptr<JobContract>> mPendingContractQueue = {};
   std::vector<Worker> mWorkers = {};
-  std::atomic<u64> mNActiveWorkers{0};
   std::atomic<u64> mNAvailableWorkers{0};
   std::atomic<bool> mShouldTerminate{false};
 };

@@ -30,18 +30,11 @@ public:
   ~Worker() noexcept { this->terminate(); }
 
 private:
-  explicit Worker(std::function<void(Worker &)> workerLoop)
-      : mThread{workerLoop, std::ref(*this)} {}
+  explicit Worker(std::function<void()> workerLoop) : mThread{workerLoop} {}
 
   void terminate() noexcept {
-    // std::mutex mtx;
-    // std::unique_lock<std::mutex> lock{mtx};
-
-    // if (!this->mShouldTerminate) {
-    //   return;
-    // }
-
-    // std::cout << std::boolalpha << this->mShouldTerminate << std::endl;
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lock{mtx};
 
     if (this->mThread.joinable()) {
       this->mThread.join();
@@ -49,7 +42,6 @@ private:
   }
 
 private:
-  bool mShouldTerminate = false;
   std::thread mThread;
 };
 
