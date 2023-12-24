@@ -36,11 +36,11 @@ public:
     this->mNAvailableWorkers.store(this->mWorkers.size());
   }
 
-  u64 nWorkers() const { return this->mWorkers.size(); }
+  u64 nWorkers() const noexcept { return this->mWorkers.size(); }
 
-  u64 nAvailableWorkers() const { return this->mNAvailableWorkers; }
+  u64 nAvailableWorkers() const noexcept { return this->mNAvailableWorkers; }
 
-  ContractStatusPtr assignJob(std::shared_ptr<JobContract> pContract) {
+  ContractStatusPtr assignJob(std::shared_ptr<JobContract> pContract) noexcept {
     ScopedLockType lock{this->mMutex};
 
     if (pContract == nullptr) {
