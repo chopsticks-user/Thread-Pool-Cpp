@@ -5,7 +5,6 @@
 #include "JobContract.hpp"
 #include "Worker.hpp"
 
-#include <iostream>
 #include <queue>
 #include <vector>
 

@@ -29,6 +29,16 @@ public:
       : mContractManager{std::make_unique<ContractManager>()},
         mWorkerManager{std::make_unique<WorkerManager>(nThreads)}, mMutex{} {}
 
+  u64 nThreads() const noexcept { return this->mWorkerManager->nWorkers(); }
+
+  u64 nAvailableThreads() const noexcept {
+    return this->mWorkerManager->nAvailableWorkers();
+  }
+
+  bool busy() const noexcept {
+    return this->mWorkerManager->nAvailableWorkers() == 0;
+  }
+
   ContractStatusPtr submitJob(tpl::JobType job) noexcept {
     ScopedLockType lock{this->mMutex};
 
