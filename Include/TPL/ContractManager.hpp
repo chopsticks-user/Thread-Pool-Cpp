@@ -10,7 +10,7 @@
 
 namespace tpl {
 
-typedef std::unique_lock<std::mutex> LockType;
+typedef std::unique_lock<std::mutex> UniqueLockType;
 
 class ContractManager {
 public:
@@ -24,13 +24,13 @@ public:
   u64 nContracts() const noexcept { return this->mContractQueue.size(); }
 
   void addContract(JobType job) noexcept {
-    LockType lock{this->mMutex};
+    UniqueLockType lock{this->mMutex};
     this->mContractQueue.push(
         JobContract{std::move(job), std::make_shared<ContractStatus>()});
   }
 
   std::shared_ptr<JobContract> getContract() noexcept {
-    LockType lock{this->mMutex};
+    UniqueLockType lock{this->mMutex};
 
     if (this->mContractQueue.empty()) {
       return {};
@@ -42,7 +42,7 @@ public:
   }
 
   void clear() noexcept {
-    LockType lock{this->mMutex};
+    UniqueLockType lock{this->mMutex};
     while (!this->mContractQueue.empty()) {
       this->mContractQueue.pop();
     }

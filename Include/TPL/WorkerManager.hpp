@@ -11,7 +11,8 @@
 
 namespace tpl {
 
-typedef std::unique_lock<std::mutex> LockType;
+typedef std::unique_lock<std::mutex> UniqueLockType;
+typedef std::lock_guard<std::mutex> ScopedLockType;
 
 class WorkerManager {
 public:
@@ -23,7 +24,9 @@ public:
   ~WorkerManager() noexcept { this->clear(); }
 
   explicit WorkerManager(u64 nWorkers) {
-    LockType lock{this->mMutex};
+    // Use std::lock_guard to reduce overhead
+    // https://codereview.stackexchange.com/questions/275834/tiny-thread-pool-implementation
+    ScopedLockType lock{this->mMutex};
 
     mWorkers.reserve(nWorkers);
     while (nWorkers > 0) {
@@ -38,7 +41,7 @@ public:
   u64 nAvailableWorkers() const { return this->mNAvailableWorkers; }
 
   ContractStatusPtr assignJob(std::shared_ptr<JobContract> pContract) {
-    LockType lock{this->mMutex};
+    ScopedLockType lock{this->mMutex};
 
     if (pContract == nullptr) {
       return {};
@@ -51,13 +54,9 @@ public:
 
   void clear() noexcept {
     {
-      auto lock = LockType{this->mMutex};
+      ScopedLockType lock{this->mMutex};
       this->mShouldTerminate.store(true);
     }
-
-    // for (auto &worker : this->mWorkers) {
-    //   worker.mShouldTerminate = true;
-    // }
 
     this->mCondition.notify_all();
     this->mWorkers.clear();
@@ -69,7 +68,7 @@ private:
     while (true) {
       std::shared_ptr<JobContract> contract;
       {
-        auto lock = LockType{this->mMutex};
+        UniqueLockType lock{this->mMutex};
 
         this->mCondition.wait(lock, [this] {
           return !this->mContractQueue.empty() || this->mShouldTerminate.load();
@@ -90,7 +89,7 @@ private:
       contract->start();
 
       {
-        auto lock = LockType{this->mMutex};
+        ScopedLockType lock{this->mMutex};
         contract->signalFinished();
         this->mPendingContractQueue.pop();
         ++this->mNAvailableWorkers;
