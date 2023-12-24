@@ -24,9 +24,6 @@
 namespace tpl {
 
 static_assert(__cplusplus >= 201402L, "TPL requires C++14 or later");
-constexpr bool cpp14 = __cplusplus < 201703L && __cplusplus >= 201402L;
-constexpr bool cpp17 = __cplusplus < 202002L && __cplusplus >= 201703L;
-constexpr bool cpp20 = !cpp14 && !cpp17;
 constexpr bool cppAtLeast14 = __cplusplus >= 201402L;
 constexpr bool cppAtLeast17 = __cplusplus >= 201703L;
 constexpr bool cppAtLeast20 = __cplusplus >= 202002L;
