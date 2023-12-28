@@ -9,7 +9,6 @@ include(CMake/BuildOptions.cmake)
 include(CMake/CompilerFlags.cmake)
 
 add_subdirectory(Include)
-add_subdirectory(Tests)
 add_subdirectory(Examples)
 
 

@@ -14,7 +14,7 @@ foreach (ExamplePath ${ExamplePaths})
         PRIVATE ${TPL_INCLUDE_DIR}
     )
     target_link_libraries(${ExampleFileName}
-        PRIVATE CompilerFlags
+        PRIVATE TPL_CompilerFlags
         PRIVATE TPL
     )
 endforeach (ExamplePath ${ExamplePaths})

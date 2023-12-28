@@ -1,14 +1,25 @@
 #include <TPL/ThreadPool.hpp>
 
+#include <cstdio>
 #include <iostream>
 
-int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
-  //
+//! Feature is not yet implemented
 
-  tpl::WorkerManager wManager(4);
-  tpl::ContractManager cManager;
+struct CustomStatus : public tpl::ContractStatus {
+  // add a custom method
+  void onFinished() const { printf("Finished!\n"); }
+};
+
+int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
+  tpl::ThreadPool pool(4);
 
   auto start = std::chrono::high_resolution_clock::now();
+
+  // pool.submitJob([](tpl::ContractStatus *pStatusBase) {
+  //   CustomStatus* pStatus = dynamic_cast
+  //   std::this_thread::sleep_for(std::chrono::seconds(1));
+  //   status->onFinished();
+  // });
 
   std::cout << "Time elapsed: "
             << std::chrono::duration<double, std::milli>(

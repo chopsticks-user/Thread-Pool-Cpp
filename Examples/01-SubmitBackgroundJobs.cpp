@@ -18,9 +18,6 @@ int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
   std::cout << "sizeof(tpl::ThreadPool) = " << sizeof(pool) << " bytes\n";
   std::cout << "ThreadPool has " << pool.nThreads() << " workers" << std::endl;
 
-  // std::ios_base::sync_with_stdio(false);
-  // std::cout.tie(nullptr);
-
   auto start = std::chrono::high_resolution_clock::now();
 
   pool.submitJob([](tpl::ContractStatus &) {
