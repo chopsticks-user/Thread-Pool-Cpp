@@ -47,6 +47,7 @@ class WorkerManager;
 class ContractStatus;
 class JobContract;
 class ContractManager;
+class ThreadPool;
 
 typedef std::unique_lock<std::mutex> UniqueLockType;
 typedef std::lock_guard<std::mutex> ScopedLockType;
