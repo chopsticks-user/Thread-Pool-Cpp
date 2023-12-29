@@ -1,12 +1,12 @@
-#include <TPL/ThreadPool.hpp>
+#include <Ushi/Ushi.hpp>
 
 #include <cstdio>
 #include <iostream>
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
-  tpl::ThreadPool pool(4);
+  ushi::ThreadPool pool(4);
 
-  auto job = [](tpl::ContractStatus &status) {
+  auto job = [](ushi::ContractStatus &status) {
     // Simulate heavy computations
     std::this_thread::sleep_for(std::chrono::seconds(1));
     if (status.stopRequested()) {

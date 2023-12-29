@@ -1,6 +1,7 @@
-#ifndef TPL_INCLUDE_TPL_WORKER_MANAGER_HPP
-#define TPL_INCLUDE_TPL_WORKER_MANAGER_HPP
+#ifndef USHI_INCLUDE_USHI_WORKER_MANAGER_HPP
+#define USHI_INCLUDE_USHI_WORKER_MANAGER_HPP
 
+#if __cplusplus >= 201402L
 #include "Base.hpp"
 #include "JobContract.hpp"
 #include "Worker.hpp"
@@ -8,7 +9,7 @@
 #include <queue>
 #include <vector>
 
-namespace tpl {
+namespace ushi {
 
 class WorkerManager {
 public:
@@ -103,6 +104,9 @@ private:
   std::atomic<bool> mShouldTerminate{false};
 };
 
-} // namespace tpl
+} // namespace ushi
+#else  // C++11 or older
+static_assert(__cplusplus >= 201402L, "Ushi library requires C++14 or newer");
+#endif // C++14 or later
 
-#endif // TPL_INCLUDE_TPL_WORKER_MANAGER_HPP
+#endif // USHI_INCLUDE_USHI_WORKER_MANAGER_HPP

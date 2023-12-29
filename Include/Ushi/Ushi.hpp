@@ -1,13 +1,14 @@
-#ifndef TPL_SOURCE_THREAD_POOL_HPP
-#define TPL_SOURCE_THREAD_POOL_HPP
+#ifndef USHI_INCLUDE_USHI_HPP
+#define USHI_INCLUDE_USHI_HPP
 
+#if __cplusplus >= 201402L
 #include "Base.hpp"
 #include "ContractManager.hpp"
 #include "JobContract.hpp"
 #include "Worker.hpp"
 #include "WorkerManager.hpp"
 
-namespace tpl {
+namespace ushi {
 
 class ThreadPool {
 public:
@@ -37,7 +38,7 @@ public:
     return this->mWorkerManager->nAvailableWorkers() == 0;
   }
 
-  ContractStatusPtr submitJob(tpl::JobType job) noexcept {
+  ContractStatusPtr submitJob(JobType job) noexcept {
     ScopedLockType lock{this->mMutex};
 
     this->mContractManager->addContract(std::move(job));
@@ -71,6 +72,9 @@ private:
   std::mutex mMutex;
 };
 
-} // namespace tpl
+} // namespace ushi
+#else  // C++11 or older
+static_assert(__cplusplus >= 201402L, "Ushi library requires C++14 or newer");
+#endif // C++14 or later
 
-#endif // TPL_SOURCE_THREAD_POOL_HPP
+#endif // USHI_INCLUDE_USHI_HPP

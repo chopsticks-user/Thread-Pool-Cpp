@@ -1,5 +1,5 @@
-#ifndef TPL_INCLUDE_TPL_BASE_HPP
-#define TPL_INCLUDE_TPL_BASE_HPP
+#ifndef USHI_INCLUDE_USHI_BASE_HPP
+#define USHI_INCLUDE_USHI_BASE_HPP
 
 #if __cplusplus >= 201402L
 #include <condition_variable>
@@ -8,25 +8,25 @@
 #include <mutex>
 #include <stdexcept>
 #include <thread>
-#endif // C++14
 
-#if __cplusplus >= 201703L
-#include <any>
-#include <optional>
-#endif // C++17
+// #if __cplusplus >= 201703L
+// #include <any>
+// #include <optional>
+// #endif // C++17 or later
 
-#if __cplusplus >= 202002L
-#include <barrier>
-#include <latch>
-#include <stop_token>
-#endif // C++20
+// #if __cplusplus >= 202002L
+// #include <barrier>
+// #include <latch>
+// #include <stop_token>
+// #endif // C++20 or later
 
-namespace tpl {
+namespace ushi {
 
-static_assert(__cplusplus >= 201402L, "TPL requires C++14 or later");
 constexpr bool cppAtLeast14 = __cplusplus >= 201402L;
 constexpr bool cppAtLeast17 = __cplusplus >= 201703L;
 constexpr bool cppAtLeast20 = __cplusplus >= 202002L;
+constexpr bool cpp14 = cppAtLeast14 && !cppAtLeast17;
+constexpr bool cpp17 = cppAtLeast17 && !cppAtLeast20;
 
 typedef int8_t i8;
 typedef int16_t i16;
@@ -56,6 +56,9 @@ typedef std::shared_ptr<ContractStatus> ContractStatusPtr;
 typedef std::weak_ptr<ContractStatus> StatusObserverPtr;
 typedef std::shared_ptr<JobContract> JobContractPtr;
 
-} // namespace tpl
+} // namespace ushi
+#else  // C++11 or older
+static_assert(__cplusplus >= 201402L, "Ushi library requires C++14 or newer");
+#endif // C++14 or later
 
-#endif // TPL_INCLUDE_TPL_BASE_HPP
+#endif // USHI_INCLUDE_USHI_BASE_HPP

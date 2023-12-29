@@ -1,21 +1,21 @@
-#include <TPL/ThreadPool.hpp>
+#include <Ushi/Ushi.hpp>
 
 #include <cstdio>
 #include <iostream>
 
 //! Feature is not yet implemented
 
-struct CustomStatus : public tpl::ContractStatus {
+struct CustomStatus : public ushi::ContractStatus {
   // add a custom method
   void onFinished() const { printf("Finished!\n"); }
 };
 
 int main([[maybe_unused]] int argc, [[maybe_unused]] char **argv) {
-  tpl::ThreadPool pool(4);
+  ushi::ThreadPool pool(4);
 
   auto start = std::chrono::high_resolution_clock::now();
 
-  // pool.submitJob([](tpl::ContractStatus *pStatusBase) {
+  // pool.submitJob([](ushi::ContractStatus *pStatusBase) {
   //   CustomStatus* pStatus = dynamic_cast
   //   std::this_thread::sleep_for(std::chrono::seconds(1));
   //   status->onFinished();
