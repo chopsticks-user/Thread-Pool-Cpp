@@ -2,9 +2,7 @@
 
 
 cmake_minimum_required(VERSION 3.15)
-project(TPLExamples LANGUAGES CXX)
-
-find_package(TPL CONFIG REQUIRED PATHS ${CMAKE_BINARY_DIR})
+project(ThreadPool_Examples LANGUAGES CXX)
 
 file(GLOB ExamplePaths ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)
 foreach (ExamplePath ${ExamplePaths})
@@ -14,7 +12,6 @@ foreach (ExamplePath ${ExamplePaths})
         PRIVATE ${TPL_INCLUDE_DIR}
     )
     target_link_libraries(${ExampleFileName}
-        PRIVATE TPL_CompilerFlags
-        PRIVATE TPL
+        PRIVATE Ushi
     )
 endforeach (ExamplePath ${ExamplePaths})

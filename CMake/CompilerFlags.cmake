@@ -16,6 +16,9 @@ set(gcc_like_cxx_flags ${ExceptionFlag};-Wall;-Wextra;-pedantic;-Wextra;
 set(msvc_cxx_flags ${ExceptionFlag};-W3)
 
 add_library(${PROJECT_NAME}_CompilerFlags INTERFACE)
+add_library(${PROJECT_NAME}::CompilerFlags
+    ALIAS ${PROJECT_NAME}_CompilerFlags
+)
 target_compile_options(${PROJECT_NAME}_CompilerFlags INTERFACE
     $<${gcc_like_cxx}: $<BUILD_INTERFACE: ${gcc_like_cxx_flags}>>
     $<${msvc_cxx}: $<BUILD_INTERFACE: ${msvc_cxx_flags}>>
