@@ -22,6 +22,41 @@
 
 namespace ushi {
 
+// https://gcc.gnu.org/wiki/Visibility
+#if defined _WIN32 || defined __CYGWIN__
+#ifdef USHI_BUILDING_DLL
+#ifdef __GNUC__
+#define USHI_PUBLIC __attribute__((dllexport))
+#else
+#define USHI_PUBLIC                                                            \
+  __declspec(                                                                  \
+      dllexport) // Note: actually gcc seems to also supports this syntax.
+#endif
+#else
+#ifdef __GNUC__
+#define USHI_PUBLIC __attribute__((dllimport))
+#else
+#define USHI_PUBLIC                                                            \
+  __declspec(                                                                  \
+      dllimport) // Note: actually gcc seems to also supports this syntax.
+#endif
+#endif
+#define USHI_PRIVATE
+#else
+#if __GNUC__ >= 4
+#define USHI_PUBLIC __attribute__((visibility("default")))
+#define USHI_PRIVATE __attribute__((visibility("hidden")))
+#else
+#define USHI_PUBLIC
+#define USHI_PRIVATE
+#endif
+#endif
+
+// Compile with fvisibility=hidden
+#ifndef USHI_EXPORT
+#define USHI_EXPORT USHI_PUBLIC
+#endif
+
 constexpr bool cppAtLeast14 = __cplusplus >= 201402L;
 constexpr bool cppAtLeast17 = __cplusplus >= 201703L;
 constexpr bool cppAtLeast20 = __cplusplus >= 202002L;
@@ -47,7 +82,7 @@ class WorkerManager;
 class ContractStatus;
 class JobContract;
 class ContractManager;
-class ThreadPool;
+class USHI_EXPORT ThreadPool;
 
 typedef std::unique_lock<std::mutex> UniqueLockType;
 typedef std::lock_guard<std::mutex> ScopedLockType;

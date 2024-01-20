@@ -1,7 +1,6 @@
-#ifndef TPL_INCLUDE_TPL_JOB_CONTRACT_HPP
-#define TPL_INCLUDE_TPL_JOB_CONTRACT_HPP
+#ifndef USHI_SOURCE_THREAD_JOB_CONTRACT_HPP
+#define USHI_SOURCE_THREAD_JOB_CONTRACT_HPP
 
-#if __cplusplus >= 201402L
 #include "Base.hpp"
 
 namespace ushi {
@@ -70,8 +69,5 @@ private:
 };
 
 } // namespace ushi
-#else  // C++11 or older
-static_assert(__cplusplus >= 201402L, "Ushi library requires C++14 or newer");
-#endif // C++14 or later
 
-#endif // TPL_INCLUDE_TPL_JOB_CONTRACT_HPP
+#endif // USHI_SOURCE_THREAD_JOB_CONTRACT_HPP

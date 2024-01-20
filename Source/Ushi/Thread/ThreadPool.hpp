@@ -1,7 +1,6 @@
-#ifndef USHI_INCLUDE_USHI_HPP
-#define USHI_INCLUDE_USHI_HPP
+#ifndef USHI_SOURCE_THREAD_POOL_HPP
+#define USHI_SOURCE_THREAD_POOL_HPP
 
-#if __cplusplus >= 201402L
 #include "Base.hpp"
 #include "ContractManager.hpp"
 #include "JobContract.hpp"
@@ -38,28 +37,12 @@ public:
     return this->mWorkerManager->nAvailableWorkers() == 0;
   }
 
-  ContractStatusPtr submitJob(JobType job) noexcept {
-    ScopedLockType lock{this->mMutex};
-
-    this->mContractManager->addContract(std::move(job));
-
-    return this->mWorkerManager->assignJob(
-        this->mContractManager->getContract());
-  }
+  ContractStatusPtr submitJob(JobType job) noexcept;
 
   // TODO: submitJob with a user-defined contract status
   // template <typename CustomStatusType> //
   // ContractStatusPtr
-  // submitJob(std::function<void(CustomStatusType &)> job) noexcept {
-  //   ScopedLockType lock{this->mMutex};
-
-  //   this->mContractManager->addContract([&job](ContractStatus &status) {
-  //     return job(static_cast<CustomStatusType &>(status));
-  //   });
-
-  //   return this->mWorkerManager->assignJob(
-  //       this->mContractManager->getContract());
-  // }
+  // submitJob(std::function<void(CustomStatusType &)> job) noexcept;
 
   void clear() noexcept {
     this->mWorkerManager->clear();
@@ -73,8 +56,5 @@ private:
 };
 
 } // namespace ushi
-#else  // C++11 or older
-static_assert(__cplusplus >= 201402L, "Ushi library requires C++14 or newer");
-#endif // C++14 or later
 
-#endif // USHI_INCLUDE_USHI_HPP
+#endif // USHI_SOURCE_THREAD_POOL_HPP
